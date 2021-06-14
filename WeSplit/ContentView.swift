@@ -10,19 +10,21 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var checkAmount = ""
-    @State private var numberOfPeople = 2
+    @State private var numberOfPeople = ""
     @State private var tipPercentage = 2
     
     let tipPercentages = [10, 15, 20, 25]
-    
-    var totalPerPerson: Double {
-        let peopleCount = Double(numberOfPeople + 2)
+    var totalAmount: Double {
         let tipSelection = Double(tipPercentages[tipPercentage])
         let orderAmount = Double(checkAmount) ?? 0
         
         let tipValue = orderAmount / 100 * tipSelection
         let grandTotal = tipValue + orderAmount
-        let perPersonShare = grandTotal / peopleCount
+        return grandTotal
+    }
+    var totalPerPerson: Double {
+        let peopleCount = Double(numberOfPeople) ?? 0
+        let perPersonShare = totalAmount / peopleCount
         return perPersonShare
     }
     
@@ -34,11 +36,13 @@ struct ContentView: View {
                     TextField("Amount", text: $checkAmount)
                         .keyboardType(.decimalPad)
                     
-                    Picker("Number of People", selection: $numberOfPeople) {
-                        ForEach(2..<10) {
-                            Text("\($0) people")
-                        }
-                    }
+                    TextField("Number of People", text: $numberOfPeople)
+                        .keyboardType(.numberPad)
+//                    Picker("Number of People", selection: $numberOfPeople) {
+//                        ForEach(2..<10) {
+//                            Text("\($0) people")
+//                        }
+//                    }
                 }
                 Section(header: Text("How much tip would you like to leave?")) {
                 Picker("Tip Percentage", selection: $tipPercentage) {
@@ -47,7 +51,11 @@ struct ContentView: View {
                         }
                     }.pickerStyle(SegmentedPickerStyle())
                 }
-                Section {
+                Section(header: Text( "Total amount")) {
+                    
+                    Text("$ \(totalAmount, specifier:"%.2f")")
+                }
+                Section(header: Text("Amount per person")) {
                     Text("$\(totalPerPerson, specifier: "%.2f")")
                 }
             }.navigationBarTitle(" WeSplit")
